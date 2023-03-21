@@ -1,27 +1,17 @@
-const express = require("express");
-const path = require("path");
+const path = require('path');
 
-const rootDir = require("../util/path");
+const express = require('express');
 
-const adminData = require("./admin");
+const shopController = require('../controllers/shop');
 
-const Router = express.Router();
+const router = express.Router();
 
-Router.get("/", (req, res, next) => {
-  //  for simple html-file content
-  // console.log("shop.js", adminData.products);
-  // res.sendFile(path.join(rootDir, "views", "shop.html"));
+router.get('/', shopController.getIndex);
 
-  // for pug template content
-  const products = adminData.products;
-  res.render("shop", {
-    prods: products,
-    pageTitle: "Shop",
-    path: "/",
-    hasProducts: products.length > 0,
-    activeShop: true,
-    productCSS: true,
-  });
-});
+router.get('/products', shopController.getProducts);
 
-module.exports = Router;
+router.get('/cart', shopController.getCart);
+
+router.get('/checkout', shopController.getCheckout);
+
+module.exports = router;
