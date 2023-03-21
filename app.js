@@ -39,7 +39,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
-app.use(errorController.getError);
+app.use(errorController.get404);
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
