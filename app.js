@@ -47,5 +47,3 @@ mongoConnect(() => {
     }
   });
 });
-
-// if server error occured,----------------

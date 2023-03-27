@@ -117,7 +117,7 @@ class User {
     const db = getDb();
     return db
       .collection("users")
-      .findOne({ _id: new ObjectId(userId) })
+      .findOne({ _id: new ObjectId(userId) })  // The new ObjectId() function is used to create a new ObjectId instance from the userId parameter.
       .then((user) => {
         console.log(user);
         return user;
