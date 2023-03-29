@@ -4,6 +4,19 @@
   box-sizing: border-box;
 }
 
+/* Change scrollbar color */
+::-webkit-scrollbar {
+  width : 0.3rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #b4390f;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f2f2f2;
+}
+
 body {
   padding    : 0;
   margin     : 0;
@@ -41,9 +54,11 @@ form {
 }
 
 .main-header__nav {
-  height     : 100%;
-  display    : none;
-  align-items: center;
+  height         : 100%;
+  width          : 100%;
+  display        : flex;
+  align-items    : center;
+  justify-content: space-between;
 }
 
 .main-header__item-list {
@@ -58,14 +73,21 @@ form {
   padding: 0;
 }
 
-.main-header__item a {
+.main-header__item a,
+.main-header__item button {
+  font           : inherit;
+  background     : transparent;
+  border         : none;
   text-decoration: none;
   color          : white;
+  cursor         : pointer;
 }
 
 .main-header__item a:hover,
 .main-header__item a:active,
-.main-header__item a.active {
+.main-header__item a.active,
+.main-header__item button:hover,
+.main-header__item button:active {
   color: #ffeb3b;
 }
 
