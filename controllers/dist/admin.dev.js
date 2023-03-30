@@ -6,8 +6,7 @@ exports.getAddProduct = function (req, res, next) {
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
     path: "/admin/add-product",
-    editing: false,
-    isAuthenticated: req.session.isLoggedIn
+    editing: false
   });
 };
 
@@ -49,8 +48,7 @@ exports.getEditProduct = function (req, res, next) {
       pageTitle: "Edit Product",
       path: "/admin/edit-product",
       editing: editMode,
-      product: product,
-      isAuthenticated: req.session.isLoggedIn
+      product: product
     });
   })["catch"](function (err) {
     return console.log(err);
@@ -64,29 +62,35 @@ exports.postEditProduct = function (req, res, next) {
   var updatedImageUrl = req.body.imageUrl;
   var updatedDesc = req.body.description;
   Product.findById(prodId).then(function (product) {
+    // it checks Product UserId and Request UserId is same? If not then redirect to shop page and can not edit this product by someone else
+    if (product.userId.toString() !== req.user._id.toString()) {
+      return res.redirect("/");
+    }
+
     product.title = updatedTitle;
     product.price = updatedPrice;
     product.description = updatedDesc;
     product.imageUrl = updatedImageUrl;
-    return product.save();
-  }).then(function (result) {
-    console.log("UPDATED PRODUCT!");
-    res.redirect("/admin/products");
+    return product.save().then(function (result) {
+      console.log("UPDATED PRODUCT!");
+      res.redirect("/admin/products");
+    });
   })["catch"](function (err) {
     return console.log(err);
   });
 };
 
 exports.getProducts = function (req, res, next) {
-  Product.find() // .select('title price -_id')
+  // It checks Products Userid is same as request Userid,then returns all products created by this user only
+  Product.find({
+    userId: req.user._id
+  }) // .select('title price -_id')
   // .populate('userId', 'name')
   .then(function (products) {
-    console.log(products);
     res.render("admin/products", {
       prods: products,
       pageTitle: "Admin Products",
-      path: "/admin/products",
-      isAuthenticated: req.session.isLoggedIn
+      path: "/admin/products"
     });
   })["catch"](function (err) {
     return console.log(err);
@@ -95,7 +99,10 @@ exports.getProducts = function (req, res, next) {
 
 exports.postDeleteProduct = function (req, res, next) {
   var prodId = req.body.productId;
-  Product.findByIdAndRemove(prodId).then(function () {
+  Product.deleteOne({
+    _id: prodId,
+    userId: req.user._id
+  }).then(function () {
     console.log("DESTROYED PRODUCT");
     res.redirect("/admin/products");
   })["catch"](function (err) {
