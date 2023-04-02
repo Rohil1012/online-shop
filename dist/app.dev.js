@@ -14,7 +14,9 @@ var MongoDBStore = require("connect-mongodb-session")(session);
 
 var csrf = require("csurf");
 
-var flash = require('connect-flash');
+var flash = require("connect-flash");
+
+var multer = require("multer");
 
 var port = 3000;
 
@@ -30,7 +32,29 @@ var store = new MongoDBStore({
   collection: "sessions"
 }); // Cross-site-request-forgery protection
 
-var csrfProtection = csrf();
+var csrfProtection = csrf(); // for image file storage (Add product) configuration
+
+var fileStorage = multer.diskStorage({
+  // set the path for storing images
+  destination: function destination(req, file, cb) {
+    cb(null, "images");
+  },
+  // for image name store in images folder
+  filename: function filename(req, file, cb) {
+    var currentDate = new Date().toISOString().slice(0, 10);
+    var ext = path.extname(file.originalname);
+    cb(null, currentDate + "-" + file.originalname);
+  }
+});
+
+var fileFilter = function fileFilter(req, file, cb) {
+  if (file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 app.set("view engine", "ejs");
 app.set("views", "views");
 
@@ -43,7 +67,12 @@ var authRoutes = require("./routes/auth");
 app.use(bodyParser.urlencoded({
   extended: false
 }));
-app.use(express["static"](path.join(__dirname, "public"))); // set up session handling in an Express.js application with MongoDB session storage
+app.use(multer({
+  storage: fileStorage,
+  fileFilter: fileFilter
+}).single("image"));
+app.use(express["static"](path.join(__dirname, "public")));
+app.use("/images", express["static"](path.join(__dirname, "images"))); // set up session handling in an Express.js application with MongoDB session storage
 
 app.use(session({
   secret: "my secret",
@@ -53,32 +82,48 @@ app.use(session({
 })); // middleware for csrf protection
 
 app.use(csrfProtection);
-app.use(flash()); // this middleware is used to ensure that user data is available to subsequent middleware functions and
+app.use(flash()); // middleware for checking every routes for generate csrftoken and logging in or not?
+
+app.use(function (req, res, next) {
+  // it allows us to set local veriable that are passed into the views and generate csrfToken
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+}); // this middleware is used to ensure that user data is available to subsequent middleware functions and
 // route handlers in the request-response cycle for authenticated requests.
 
 app.use(function (req, res, next) {
+  // throw new Error("Dummy");
   if (!req.session.user) {
     return next();
   }
 
   User.findById(req.session.user._id).then(function (user) {
+    // if there is not user then call next directly
+    if (!user) {
+      return next();
+    }
+
     req.user = user;
     next();
   })["catch"](function (err) {
-    return console.log(err);
+    next(new Error(err));
   });
-}); // middleware for checking every routes for csrftoken and logging in or not?
-
-app.use(function (req, res, next) {
-  // it allows us to set local veriablea that are passed into the views
-  res.locals.isAuthenticated = req.session.isLoggedIn;
-  res.locals.csrfToken = req.csrfToken();
-  next();
 });
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
+app.get("/500", errorController.get500);
 app.use(errorController.get404);
+app.use(function (error, req, res, next) {
+  // res.status(error.httpStatusCode).render(...);
+  // res.redirect("/500");
+  res.status(500).render("500", {
+    pageTitle: "Error!",
+    path: "/500",
+    isAuthenticated: req.session.isLoggedIn
+  });
+});
 mongoose.connect(MONGODB_URI).then(function (result) {
   console.log("Connected Successfully!");
   var server = app.listen(port, function () {
