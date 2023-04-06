@@ -1,8 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const stripe = require("stripe")(
-  "sk_test_51Ms5FdSAfcggcN6aHVpSCpTPAqvCwSqaFZdmKalTOxSpIuEzrA4s852D3ei3ncyW528UMYXIWkdVfcj3ggiqnuny00K3d7oQ1I"
-);
+const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 const PDFDocument = require("pdfkit");
 
@@ -159,13 +157,18 @@ exports.getCheckout = (req, res, next) => {
         payment_method_types: ["card"],
         line_items: products.map((p) => {
           return {
-            name: p.productId.title,
-            description: p.productId.description,
-            amount: p.productId.price * 100,
-            currency: "usd",
+            price_data: {
+              currency: "inr",
+              unit_amount: p.productId.price * 100,
+              product_data: {
+                name: p.productId.title,
+                description: p.productId.description,
+              },
+            },
             quantity: p.quantity,
           };
         }),
+        mode: "payment",
         success_url:
           req.protocol + "://" + req.get("host") + "/checkout/success", // => http://localhost:3000
         cancel_url: req.protocol + "://" + req.get("host") + "/checkout/cancel",
@@ -181,9 +184,10 @@ exports.getCheckout = (req, res, next) => {
       });
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
+      // const error = new Error(err);
+      // error.httpStatusCode = 500;
+      // return next(error);
+      console.log(err);
     });
 };
 

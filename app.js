@@ -1,4 +1,6 @@
 const path = require("path");
+const fs = require("fs");
+const https = require("https");
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -8,14 +10,18 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
 const flash = require("connect-flash");
 const multer = require("multer");
-
-const port = 3000;
+const helmet = require("helmet");
+const compression = require("compression");
+const morgan = require("morgan");
 
 const errorController = require("./controllers/error");
 const User = require("./models/user");
 
-const MONGODB_URI =
-  "mongodb+srv://rohil:ETfOcAwiectKvGtg@cluster0.wyqyer0.mongodb.net/shop";
+require("dotenv").config();
+
+console.log(process.env.NODE_ENV);
+
+const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.wyqyer0.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}`;
 
 const app = express();
 
@@ -25,18 +31,16 @@ const store = new MongoDBStore({
   collection: "sessions",
 });
 
-// Cross-site-request-forgery protection
 const csrfProtection = csrf();
 
-// for image file storage (Add product) configuration
+// const privateKey = fs.readFileSync("server.key");
+// const certificate = fs.readFileSync("server.cert");
 
 const fileStorage = multer.diskStorage({
-  // set the path for storing images
   destination: (req, file, cb) => {
     cb(null, "images");
   },
 
-  // for image name store in images folder
   filename: (req, file, cb) => {
     const currentDate = new Date().toISOString().slice(0, 10);
     const ext = path.extname(file.originalname);
@@ -62,6 +66,19 @@ app.set("views", "views");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
+
+// We want write log data using morgan into file not in console
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  { flags: "a" }
+);
+
+// Add secure headers in responses and requests for attacks
+app.use(helmet());
+// compress all responses
+app.use(compression());
+// Simplifies the process of logging requests and find some logging data
+app.use(morgan("combined", { stream: accessLogStream }));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -123,23 +140,26 @@ app.get("/500", errorController.get500);
 
 app.use(errorController.get404);
 
-app.use((error, req, res, next) => {
-  // res.status(error.httpStatusCode).render(...);
-  // res.redirect("/500");
-  res.status(500).render("500", {
-    pageTitle: "Error!",
-    path: "/500",
-    isAuthenticated: req.session.isLoggedIn,
-  });
+// app.use((error, req, res, next) => {
+//   // res.status(error.httpStatusCode).render(...);
+//   // res.redirect("/500");
+res.status(500).render("500", {
+  pageTitle: "Error!",
+  path: "/500",
+  isAuthenticated: req.session.isLoggedIn,
 });
+// });
 
 mongoose
   .connect(MONGODB_URI)
   .then((result) => {
     console.log("Connected Successfully!");
-    const server = app.listen(port, () => {
-      console.log(`Example app listening at http://localhost:${port}`);
-    });
+
+    // if you want to use manually SSL certificate then use this otherwise Hosting provider can do with its own
+    // const server = https
+    //   .createServer({ key: privateKey, cert: certificate }, app)
+    //   .listen(process.env.PORT || 3000);
+    const server = app.listen(process.env.PORT || 3000);
 
     server.on("error", (error) => {
       if (error.code === "EADDRINUSE") {
