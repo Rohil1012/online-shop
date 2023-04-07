@@ -1,8 +1,8 @@
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config();
+// require("dotenv").config();
 
-const stripe = require("stripe")(process.env.STRIPE_KEY);
+const stripe = require("stripe")(process.env.STRIPE_PVT_KEY);
 
 const PDFDocument = require("pdfkit");
 

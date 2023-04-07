@@ -8,11 +8,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var fs = require("fs");
 
-var path = require("path");
+var path = require("path"); // require("dotenv").config();
 
-require("dotenv").config();
 
-var stripe = require("stripe")(process.env.STRIPE_KEY);
+var stripe = require("stripe")(process.env.STRIPE_PVT_KEY);
 
 var PDFDocument = require("pdfkit");
 

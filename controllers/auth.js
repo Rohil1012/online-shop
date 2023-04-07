@@ -4,14 +4,14 @@ const bcrypt = require("bcryptjs");
 // Create unique secure random value
 const crypto = require("crypto");
 
-const nodemailer = require("nodemailer");
-const sendgridTransport = require("nodemailer-sendgrid-transport");
+// const nodemailer = require("nodemailer");
+// const sendgridTransport = require("nodemailer-sendgrid-transport");
 
 // validation result will be a function that allows us to gather all the errors
 
 const { validationResult } = require("express-validator");
 
-require("dotenv").config();
+// require("dotenv").config();
 const User = require("../models/user");
 
 // const tarnsporter = nodemailer.createTransport(
@@ -22,13 +22,13 @@ const User = require("../models/user");
 //   })
 // );
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.PASSWORD,
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: process.env.EMAIL,
+//     pass: process.env.PASSWORD,
+//   },
+// });
 
 exports.getLogin = (req, res, next) => {
   // checks if message length is greater than 0 then flash message
@@ -192,19 +192,19 @@ exports.postSignup = (req, res, next) => {
     .then((result) => {
       res.redirect("/login");
       // send email for successful signup
-      let details = {
-        from: "rohilgajera@gmail.com",
-        to: email,
-        subject: "Signup succeeded!",
-        html: "<h1>You successfully signed up!</h1>",
-      };
-      return transporter.sendMail(details, (err) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("Email sent");
-        }
-      });
+      // let details = {
+      //   from: "rohilgajera@gmail.com",
+      //   to: email,
+      //   subject: "Signup succeeded!",
+      //   html: "<h1>You successfully signed up!</h1>",
+      // };
+      // return transporter.sendMail(details, (err) => {
+      //   if (err) {
+      //     console.log(err);
+      //   } else {
+      //     console.log("Email sent");
+      //   }
+      // });
     })
     .catch((err) => {
       const error = new Error(err);
