@@ -63,14 +63,14 @@ const fileFilter = (req, file, cb) => {
 app.set("view engine", "ejs");
 app.set("views", "views");
 
-app.get("/", (req, res) => {
-  res
-    .set(
-      "Content-Security-Policy",
-      "default-src *; style-src 'self' http://* 'unsafe-inline'; script-src 'self' http://* 'unsafe-inline' 'unsafe-eval'"
-    )
-    .send("<html><head></head><body></body></html>");
-});
+// app.get("/", (req, res) => {
+//   res
+//     .set(
+//       "Content-Security-Policy",
+//       "default-src *; style-src 'self' http://* 'unsafe-inline'; script-src 'self' http://* 'unsafe-inline' 'unsafe-eval'"
+//     )
+//     .send("<html><head></head><body></body></html>");
+// });
 
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");

@@ -63,10 +63,14 @@ var fileFilter = function fileFilter(req, file, cb) {
 };
 
 app.set("view engine", "ejs");
-app.set("views", "views");
-app.get("/", function (req, res) {
-  res.set("Content-Security-Policy", "default-src *; style-src 'self' http://* 'unsafe-inline'; script-src 'self' http://* 'unsafe-inline' 'unsafe-eval'").send("<html><head></head><body></body></html>");
-});
+app.set("views", "views"); // app.get("/", (req, res) => {
+//   res
+//     .set(
+//       "Content-Security-Policy",
+//       "default-src *; style-src 'self' http://* 'unsafe-inline'; script-src 'self' http://* 'unsafe-inline' 'unsafe-eval'"
+//     )
+//     .send("<html><head></head><body></body></html>");
+// });
 
 var adminRoutes = require("./routes/admin");
 
