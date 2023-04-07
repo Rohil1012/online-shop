@@ -1,5 +1,7 @@
 const fs = require("fs");
 const path = require("path");
+require("dotenv").config();
+
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 const PDFDocument = require("pdfkit");
@@ -237,35 +239,35 @@ exports.getOrders = (req, res, next) => {
     });
 };
 
-exports.postOrder = (req, res, next) => {
-  req.user
-    .populate("cart.items.productId")
-    // .execPopulate()
-    .then((user) => {
-      const products = user.cart.items.map((i) => {
-        return { quantity: i.quantity, product: { ...i.productId._doc } };
-      });
-      const order = new Order({
-        user: {
-          email: req.user.email,
-          userId: req.user,
-        },
-        products: products,
-      });
-      return order.save();
-    })
-    .then((result) => {
-      return req.user.clearCart();
-    })
-    .then(() => {
-      res.redirect("/orders");
-    })
-    .catch((err) => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
-};
+// exports.postOrder = (req, res, next) => {
+//   req.user
+//     .populate("cart.items.productId")
+//     // .execPopulate()
+//     .then((user) => {
+//       const products = user.cart.items.map((i) => {
+//         return { quantity: i.quantity, product: { ...i.productId._doc } };
+//       });
+//       const order = new Order({
+//         user: {
+//           email: req.user.email,
+//           userId: req.user,
+//         },
+//         products: products,
+//       });
+//       return order.save();
+//     })
+//     .then((result) => {
+//       return req.user.clearCart();
+//     })
+//     .then(() => {
+//       res.redirect("/orders");
+//     })
+//     .catch((err) => {
+//       const error = new Error(err);
+//       error.httpStatusCode = 500;
+//       return next(error);
+//     });
+// };
 
 exports.getInvoice = (req, res, next) => {
   const orderId = req.params.orderId;

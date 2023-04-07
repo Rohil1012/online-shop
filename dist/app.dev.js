@@ -20,9 +20,8 @@ var csrf = require("csurf");
 
 var flash = require("connect-flash");
 
-var multer = require("multer");
+var multer = require("multer"); // const helmet = require("helmet");
 
-var helmet = require("helmet");
 
 var compression = require("compression"); // const morgan = require("morgan");
 
@@ -76,9 +75,9 @@ var authRoutes = require("./routes/auth"); // We want write log data using morga
 //   { flags: "a" }
 // );
 // Add secure headers in responses and requests for attacks
+// app.use(helmet());
+// compress all responses
 
-
-app.use(helmet()); // compress all responses
 
 app.use(compression()); // Simplifies the process of logging requests and find some logging data
 // app.use(morgan("combined", { stream: accessLogStream }));

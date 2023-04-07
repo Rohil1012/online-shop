@@ -10,6 +10,8 @@ var fs = require("fs");
 
 var path = require("path");
 
+require("dotenv").config();
+
 var stripe = require("stripe")(process.env.STRIPE_KEY);
 
 var PDFDocument = require("pdfkit");
@@ -214,35 +216,36 @@ exports.getOrders = function (req, res, next) {
     error.httpStatusCode = 500;
     return next(error);
   });
-};
+}; // exports.postOrder = (req, res, next) => {
+//   req.user
+//     .populate("cart.items.productId")
+//     // .execPopulate()
+//     .then((user) => {
+//       const products = user.cart.items.map((i) => {
+//         return { quantity: i.quantity, product: { ...i.productId._doc } };
+//       });
+//       const order = new Order({
+//         user: {
+//           email: req.user.email,
+//           userId: req.user,
+//         },
+//         products: products,
+//       });
+//       return order.save();
+//     })
+//     .then((result) => {
+//       return req.user.clearCart();
+//     })
+//     .then(() => {
+//       res.redirect("/orders");
+//     })
+//     .catch((err) => {
+//       const error = new Error(err);
+//       error.httpStatusCode = 500;
+//       return next(error);
+//     });
+// };
 
-exports.postOrder = function (req, res, next) {
-  req.user.populate("cart.items.productId") // .execPopulate()
-  .then(function (user) {
-    var products = user.cart.items.map(function (i) {
-      return {
-        quantity: i.quantity,
-        product: _objectSpread({}, i.productId._doc)
-      };
-    });
-    var order = new Order({
-      user: {
-        email: req.user.email,
-        userId: req.user
-      },
-      products: products
-    });
-    return order.save();
-  }).then(function (result) {
-    return req.user.clearCart();
-  }).then(function () {
-    res.redirect("/orders");
-  })["catch"](function (err) {
-    var error = new Error(err);
-    error.httpStatusCode = 500;
-    return next(error);
-  });
-};
 
 exports.getInvoice = function (req, res, next) {
   var orderId = req.params.orderId;

@@ -10,7 +10,7 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
 const flash = require("connect-flash");
 const multer = require("multer");
-const helmet = require("helmet");
+// const helmet = require("helmet");
 const compression = require("compression");
 // const morgan = require("morgan");
 
@@ -74,7 +74,7 @@ const authRoutes = require("./routes/auth");
 // );
 
 // Add secure headers in responses and requests for attacks
-app.use(helmet());
+// app.use(helmet());
 // compress all responses
 app.use(compression());
 // Simplifies the process of logging requests and find some logging data
@@ -135,6 +135,7 @@ app.use((req, res, next) => {
       next(new Error(err));
     });
 });
+
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
