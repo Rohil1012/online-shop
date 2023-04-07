@@ -2,7 +2,7 @@
   "name": "shop",
   "version": "1.0.0",
   "description": "Its an Amazing package",
-  "main": "index.js",
+  "main": "app.js",
   "engines": {
     "node": "18.14.2"
   },
