@@ -9,6 +9,7 @@ var shopController = require("../controllers/shop");
 var isAuth = require("../middleware/is-auth");
 
 var router = express.Router();
+router.get("/", shopController.getIndex);
 router.get("/products", shopController.getProducts);
 router.get("/products/:productId", shopController.getProduct);
 router.get("/cart", isAuth, shopController.getCart);
@@ -21,5 +22,4 @@ router.get("/checkout/cancel", shopController.getCheckout); // We do not need to
 
 router.get("/orders", isAuth, shopController.getOrders);
 router.get("/orders/:orderId", isAuth, shopController.getInvoice);
-router.get("/", shopController.getIndex);
 module.exports = router;
