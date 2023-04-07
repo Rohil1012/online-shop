@@ -24,9 +24,8 @@ var multer = require("multer");
 
 var helmet = require("helmet");
 
-var compression = require("compression");
+var compression = require("compression"); // const morgan = require("morgan");
 
-var morgan = require("morgan");
 
 var errorController = require("./controllers/error");
 
@@ -72,19 +71,21 @@ var adminRoutes = require("./routes/admin");
 var shopRoutes = require("./routes/shop");
 
 var authRoutes = require("./routes/auth"); // We want write log data using morgan into file not in console
+// const accessLogStream = fs.createWriteStream(
+//   path.join(__dirname, "logs/access.log"),
+//   { flags: "a" }
+// );
+// Add secure headers in responses and requests for attacks
 
-
-var accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), {
-  flags: "a"
-}); // Add secure headers in responses and requests for attacks
 
 app.use(helmet()); // compress all responses
 
 app.use(compression()); // Simplifies the process of logging requests and find some logging data
+// app.use(morgan("combined", { stream: accessLogStream }));
+// accessLogStream.on("error", (err) => {
+//   console.error(`Error writing to access log: ${err}`);
+// });
 
-app.use(morgan("combined", {
-  stream: accessLogStream
-}));
 app.use(bodyParser.urlencoded({
   extended: false
 }));
