@@ -97,9 +97,9 @@ exports.getCart = function (req, res, next) {
       products: products
     });
   })["catch"](function (err) {
-    var error = new Error(err);
-    error.httpStatusCode = 500;
-    return next(error);
+    console.log(err); // const error = new Error(err);
+    // error.httpStatusCode = 500;
+    // return next(error);
   });
 };
 
@@ -110,9 +110,9 @@ exports.postCart = function (req, res, next) {
   }).then(function (result) {
     res.redirect("/cart");
   })["catch"](function (err) {
-    var error = new Error(err);
-    error.httpStatusCode = 500;
-    return next(error);
+    console.log(err); // const error = new Error(err);
+    // error.httpStatusCode = 500;
+    // return next(error);
   });
 };
 
