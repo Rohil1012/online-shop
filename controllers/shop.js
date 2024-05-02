@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-// require("dotenv").config();
+require("dotenv").config();
 
 const stripe = require("stripe")(process.env.STRIPE_PVT_KEY);
 
@@ -299,36 +299,22 @@ exports.getInvoice = (req, res, next) => {
       pdfDoc.text("-----------------------");
       let totalPrice = 0;
       order.products.forEach((prod) => {
-        totalPrice = totalPrice + prod.quantity * prod.product.price;
+        const productName = prod.product.title;
+        const quantity = prod.quantity;
+        const amount = prod.quantity * prod.product.price;
+
+        totalPrice += amount;
+
         pdfDoc
           .fontSize(14)
           .text(
-            prod.product.title +
-              " - " +
-              prod.quantity +
-              " x " +
-              "$" +
-              prod.product.price
+            `Product: ${productName} - Quantity: ${quantity} - Amount: ${amount}`
           );
       });
       pdfDoc.text("----------");
-      pdfDoc.fontSize(20).text("Total Price: $" + totalPrice);
+      pdfDoc.fontSize(20).text("Total Price: " + totalPrice);
 
       pdfDoc.end();
-      // fs.readFile(invoicePath, (err, data) => {
-      //   if (err) {
-      //     return next(err);
-      //   }
-      //   res.setHeader('Content-Type', 'application/pdf');
-      //   res.setHeader(
-      //     'Content-Disposition',
-      //     'inline; filename="' + invoiceName + '"'
-      //   );
-      //   res.send(data);
-      // });
-      // const file = fs.createReadStream(invoicePath);
-
-      // file.pipe(res);
     })
     .catch((err) => next(err));
 };
